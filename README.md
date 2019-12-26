@@ -22,6 +22,8 @@ canvas画拓扑图工具
 
 https://github.com/zhangwenyan/opentopo/issues
 
+qq:799378666
+
 ## 关于作者
 
 https://github.com/zhangwenyan
