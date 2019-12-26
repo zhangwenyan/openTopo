@@ -5,6 +5,8 @@
     特色(推广的一些亮点)
 ## 安装和下载
 
+https://github.com/zhangwenyan/opentopo/releases
+
 ## 快速使用
 简单的接入文档
 
