@@ -13,7 +13,7 @@ module.exports = {
         "sourceType": "module"
     },
     "rules": {
-        "no-debugger":1,
-        "no-unused-vars":1
+        "no-debugger": 1,
+        "no-unused-vars": 1
     }
 };

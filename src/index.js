@@ -1,13 +1,15 @@
 import Stage from './Stage';
 import Scene from './Scene';
-import Rect from './Rect'
+import Rect from './node/Rect'
 import Link from './Link'
-import Circle from './Circle'
+import Circle from './node/Circle'
+import RectContainer from './container/RectContainer'
 
 export default {
     Stage,
     Scene,
     Rect,
     Link,
-    Circle
+    Circle,
+    RectContainer
 };

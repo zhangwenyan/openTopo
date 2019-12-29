@@ -1,20 +1,30 @@
 import Base from './Base'
+import BaseNode from './node/BaseNode';
+import Link from './Link';
+import BaseContainer from './container/BaseContainer';
 //画布
 export default class Scene extends Base {
+
+    text = null;//标题,左上角
+    fillStyle = 'green';
+
+    elements = [];
+    element_nodes = [];
+    element_links = [];
+    element_containers = [];
+
+    elementMap = {}//暂时用来区分add是否重复添加元素
+
+    dragEnable = true;//可拖拽
+    scaleX = 1;//横向缩放角度
+    scaleY = 1;//纵向缩放角度
+    translateX = 0;//横向偏移
+    translateY = 0;//纵向偏移
+    wheelZoom = 0.95;//鼠标缩放速度
+
     constructor(stage) {
         super();
-        this.fillStyle = 'green';//背景
-        this.text = null;//标题
-        this.elements = [];
-
-        this.dragEnable = true;//可拖拽
-        this.scaleX = 1;//横向缩放角度
-        this.scaleY = 1;//纵向缩放角度
-        this.translateX = 0;//横向偏移
-        this.translateY = 0;//纵向偏移
-        this.wheelZoom = 0.95;//鼠标缩放速度
-
-        stage.scene = this;
+        stage.scene = this;//#TODO
     }
     paint(ctx) {
         var canvas = ctx.canvas;
@@ -45,14 +55,31 @@ export default class Scene extends Base {
         //#endregion
 
 
-        for (var i in this.elements) {
-            var ele = this.elements[i];
-            if (ele.visible) {
-                ele.paint(ctx, {
-                    focus: ele == this.focusEle
-                });
+
+        for (let c of this.element_containers) {
+            if (c.visible) {
+                c.paint(ctx, {
+                    focus: c == this.focusEle
+                })
             }
         }
+
+        for (let link of this.element_links) {
+            if (link.visible) {
+                link.paint(ctx, {
+                    focus: link == this.focusEle
+                })
+            }
+        }
+
+        for (let node of this.element_nodes) {
+            if (node.visible) {
+                node.paint(ctx, {
+                    focus: node == this.focusEle
+                })
+            }
+        }
+
 
         ctx.restore();
 
@@ -62,11 +89,55 @@ export default class Scene extends Base {
      * 添加元素
      */
     add() {
-        for (var i in arguments) {
-            this.elements.push(arguments[i]);
+        //#TODO 算法可能慢,用buff或者一步完成
+        for (let ele of arguments) {
+            this.elements.push(ele);
+            if (ele instanceof BaseNode) {
+                this.element_nodes.push(ele);
+            }
+            else if (ele instanceof Link) {
+                this.element_links.push(ele);
+            }
+            else if (ele instanceof BaseContainer) {
+                this.element_containers.push(ele);
+            }
         }
-        this.elements.sort(function (a, b) {
-            return a.z_index - b.z_index;
-        });
+    }
+
+    /**
+     * 移除元素
+     */
+    remove(ele) {
+        for (let i in this.elements) {
+            let ei = this.elements[i];
+            if (ele == ei) {
+                this.elements.splice(i, 1);
+                if (ele instanceof INode) {
+                    for (let j in this.element_nodes) {
+                        let ej = this.element_nodes[j];
+                        if (ele == ej) {
+                            this.element_nodes.splice(j, 1);
+                        }
+                    }
+                }
+                else if (ele instanceof Link) {
+                    for (let j in this.element_links) {
+                        let ej = this.element_links[j];
+                        if (ele == ej) {
+                            this.element_links.splice(j, 1);
+                        }
+                    }
+                }
+                else if (ele instanceof BaseContainer) {
+                    for (let j in this.element_containers) {
+                        let ej = this.element_containers[j];
+                        if (ele == ej) {
+                            this.element_containers.splice(j, 1);
+                        }
+                    }
+                }
+                break;
+            }
+        }
     }
 }

@@ -1,22 +1,25 @@
-import Element from './Element'
+import Element from '../Element'
+import BaseNode from './BaseNode';
 /**
  * x,y  圆心
  * radius   半径
  */
-export default class Circle extends Element {
+export default class Circle extends BaseNode {
+    text;
+    x;
+    y;
+    fillStyle = 'blue';//背景顔色
+    radius = 30;//半径
+    fillStyle_text = 'black';
+    fillStyle_text_focus = 'gold';
+    font_text = '15px Arial';
+    _z_index = 1;
+    
     constructor(text, x, y) {
         super();
         this.text = text;
         this.x = x;
         this.y = y;
-        this.fillStyle = 'blue';
-        this.radius = 30;
-        this.fillStyle = 'blue';//背景顔色
-        this.fillStyle_text = 'black';
-        this.fillStyle_text_focus = 'gold';
-        this.font_text = '15px Arial';
-        this.z_index = 1;
-
     }
     centerPoint() {
         return {

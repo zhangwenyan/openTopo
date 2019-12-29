@@ -1,18 +1,23 @@
-import Element from './Element'
+import Element from '../Element'
+import BaseNode from './BaseNode';
 
-export default class Rect extends Element {
+export default class Rect extends BaseNode {
+    text = null;
+    x = 0;
+    y = 0;
+    width = 30;
+    height = 30;
+    fillStyle = 'blue';//背景颜色
+    fillStyle_text = 'black';//文本样式
+    fillStyle_text_focus = 'gold';//获得焦点时文本颜色
+    font_text = '15px Arial';//文本字体
+    _z_index = 1;
+
     constructor(text, x, y) {
         super();
         this.text = text;//标题文本
         this.x = x;
         this.y = y;
-        this.width = 30;
-        this.height = 30;
-        this.fillStyle = 'blue';//背景顔色
-        this.fillStyle_text = 'black';
-        this.fillStyle_text_focus = 'gold';
-        this.font_text = '15px Arial';
-        this.z_index = 1;
     }
     centerPoint() {
         return {
@@ -21,7 +26,7 @@ export default class Rect extends Element {
         }
     }
 
-    paintFocus(ctx) {
+    _paintFocus(ctx) {
         ctx.save();
         ctx.fillStyle = '#eeeeee';
         ctx.globalAlpha = 0.2;
@@ -29,7 +34,7 @@ export default class Rect extends Element {
         ctx.fillRect(this.x - bw, this.y - bw, this.width + bw * 2, this.height + bw * 2);
         ctx.restore();
     }
-    paintSelected(ctx) {
+    _paintSelected(ctx) {
         ctx.save();
         ctx.fillStyle = '#eeeeaa';
         ctx.globalAlpha = 0.3;
@@ -41,10 +46,10 @@ export default class Rect extends Element {
     paint(ctx, ps) {
         ctx.save();
         if (ps && ps.focus) {
-            this.paintFocus(ctx);
+            this._paintFocus(ctx);
         }
         if (this.selected) {
-            this.paintSelected(ctx);
+            this._paintSelected(ctx);
         }
 
         var image = null;
@@ -72,13 +77,23 @@ export default class Rect extends Element {
         ctx.restore();
     }
 
-    setImage(imagesrc) {
-        var img = new Image();
-        img.src = imagesrc;
-        img.onload = function () {
-            img.loadSuccess = true;
-        };
-        this.image = img;
+
+    set image(val) {//must loaded or url
+        if (typeof (val) == 'string') {
+            this._image = new Image();
+            this._image.src = val;
+            let that = this;
+            this._image.onload = () => {
+                that._image.loadSuccess = true;
+            };
+        } else {
+            this._image = val;
+            this._image.loadSuccess = true;
+        }
+    }
+
+    get image() {
+        return this._image;
     }
 
     inBound(pointX, pointY) {

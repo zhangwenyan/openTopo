@@ -2,6 +2,7 @@ import Base from './Base'
 
 class Stage extends Base {
 
+    //获取鼠标点击canvas所在相对位置
     getCanvasPx(evt) {
         return (evt.clientX - this.canvas.offsetLeft + (document.documentElement || document.body).scrollLeft - this.canvas.width / 2) / this.scene.scaleX + this.canvas.width / 2 - this.scene.translateX;
     }
@@ -9,90 +10,104 @@ class Stage extends Base {
         return (evt.clientY - this.canvas.offsetTop + (document.documentElement || document.body).scrollTop - this.canvas.height / 2) / this.scene.scaleY + this.canvas.height / 2 - this.scene.translateY;
     }
 
+    get width() {
+        return this._width;
+    }
+
+    set width(val) {
+        this.canvas.width = this._width = val;
+    }
+
+    get height() {
+        return this._height;
+    }
+
+    set height(val) {
+        this.canvas.height = this._height = val;
+    }
+
+    scene = null;//画布
+
     constructor(canvas, width, height) {
         super();
         this.canvas = typeof (canvas) == 'string' ? document.querySelector(canvas) : canvas;
         this.width = width || this.canvas.width;
         this.height = height || this.canvas.height;
-
-        this.scene = null;//画布
-
         this.ctx = this.canvas.getContext('2d');
 
-        var me = this;
-        var f = function () {
-            me.tick();
-            setTimeout(f);
+        let that = this;
+        let f = function () {
+            that.tick();
+            requestAnimationFrame(f);
         }
-        this.tickTimes = 1;
         f();
 
-        me.canvas.addEventListener('mousemove', function (evt) {
-            if (!me.scene) {
+        that.canvas.addEventListener('mousemove', function (evt) {
+            if (!that.scene) {
                 return;
             }
             evt = evt || event;
-            var px = me.getCanvasPx(evt);
-            var py = me.getCanvasPy(evt);
-            me.scene.focusEle = null;
-            for (var i in me.scene.elements) {
-                var ele = me.scene.elements[i];
+            var px = that.getCanvasPx(evt);
+            var py = that.getCanvasPy(evt);
+            that.scene.focusEle = null;
+            for (var i in that.scene.elements) {
+                var ele = that.scene.elements[i];
                 if (ele.inBound(px, py)) {
-                    if(ele!=me.scene.focusEle){
-                        me.scene.focusEle = ele;
-                        ele.triggerEvent('mouseover',evt);
+                    if (ele != that.scene.focusEle) {
+                        that.scene.focusEle = ele;
+                        ele.triggerEvent('mouseover', evt);
                     }
                     return;
-                }else{
-                    if(ele==me.scene.focusEle){
-                        ele.triggerEvent('mouseout',evt);
-                        ele.triggerEvent('mouseleave',evt);
+                } else {
+                    if (ele == that.scene.focusEle) {
+                        ele.triggerEvent('mouseout', evt);
+                        ele.triggerEvent('mouseleave', evt);
                     }
                 }
             }
         });
-        me.canvas.addEventListener('mousedown', function (evt) {
-            if (!me.scene) {
+        that.canvas.addEventListener('mousedown', function (evt) {
+            if (!that.scene) {
                 return;
             }
             evt = evt || event;
-            var px = me.getCanvasPx(evt);
-            var py = me.getCanvasPy(evt);
+            var px = that.getCanvasPx(evt);
+            var py = that.getCanvasPy(evt);
 
             var downType = 'scene';
             if (!evt.ctrlKey) {
-                me.scene.elements.forEach(function (ele) {
+                that.scene.elements.forEach(function (ele) {
                     ele.selected = false;
                 });
             }
-            for (var i in me.scene.elements) {
-                var ele = me.scene.elements[i];
+            for (var i in that.scene.elements) {
+                var ele = that.scene.elements[i];
                 if (ele.inBound(px, py)) {
                     ele.selected = true;
                     downType = 'ele';
-                    ele.triggerEvent('mousedown',evt);
+                    ele.triggerEvent('mousedown', evt);
                     break;
                 }
             }
 
             if (downType == 'scene') {
-                me.canvas.style.cursor = 'pointer';
+                that.canvas.style.cursor = 'pointer';
             } else {
-                me.canvas.style.cursor = 'move';
+                that.canvas.style.cursor = 'move';
             }
             let downPx = px;
             let downPy = py;
 
-            var evt_mousemove = function(evt){
+            var evt_mousemove = function (evt) {
                 evt = evt || event;
-                var px = me.getCanvasPx(evt);
-                var py = me.getCanvasPy(evt);
+                var px = that.getCanvasPx(evt);
+                var py = that.getCanvasPy(evt);
                 var dx = px - downPx;
                 var dy = py - downPy;
                 if (downType == 'ele') {
                     downPx = px;
                     downPy = py;
-                    me.scene.elements.forEach(function (ele) {
+                    that.scene.elements.forEach(function (ele) {
                         if (ele.selected && ele.dragEnable) {
                             ele.x += dx;
                             ele.y += dy;
@@ -100,32 +115,32 @@ class Stage extends Base {
                     });
                 }
                 else if (downType == 'scene') {
-                    if (me.scene.dragEnable) {
-                        me.scene.translateX += dx;
-                        me.scene.translateY += dy;
+                    if (that.scene.dragEnable) {
+                        that.scene.translateX += dx;
+                        that.scene.translateY += dy;
                     }
                 }
             }
-            me.canvas.addEventListener('mousemove',evt_mousemove);
-            var evt_mouseup = function(){
-                me.canvas.removeEventListener('mousemove',evt_mousemove);
-                document.removeEventListener('mouseup',evt_mouseup);
-                me.canvas.style.cursor = 'default';
+            that.canvas.addEventListener('mousemove', evt_mousemove);
+            var evt_mouseup = function () {
+                that.canvas.removeEventListener('mousemove', evt_mousemove);
+                document.removeEventListener('mouseup', evt_mouseup);
+                that.canvas.style.cursor = 'default';
             };
-            document.addEventListener('mouseup',evt_mouseup);
+            document.addEventListener('mouseup', evt_mouseup);
         })
 
-        me.canvas.onmousewheel = function (evt) {
-            if (!me.scene) {
+        that.canvas.onmousewheel = function (evt) {
+            if (!that.scene) {
                 return;
             }
             evt = evt || event;
             if (evt.deltaY > 0) {
-                me.scene.scaleY *= me.scene.wheelZoom;
-                me.scene.scaleX *= me.scene.wheelZoom;
+                that.scene.scaleY *= that.scene.wheelZoom;
+                that.scene.scaleX *= that.scene.wheelZoom;
             } else {
-                me.scene.scaleY /= me.scene.wheelZoom;
-                me.scene.scaleX /= me.scene.wheelZoom;
+                that.scene.scaleY /= that.scene.wheelZoom;
+                that.scene.scaleX /= that.scene.wheelZoom;
             }
         }
     }
@@ -146,23 +161,5 @@ class Stage extends Base {
 
 }
 
-Object.defineProperties(Stage.prototype, {
-    width: {
-        get: function () {
-            return this._width;
-        }, set: function (a) {
-            this._width = a;
-            this.canvas.width = this._width;
-        }
-    },
-    height: {
-        get: function () {
-            return this._height;
-        }, set: function (a) {
-            this._height = a;
-            this.canvas.height = this._height;
-        }
-    }
-});
 
 export default Stage;
