@@ -1,51 +1,37 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
-    entry: ['./example/index.js'],
-    plugins: [
-        new HtmlWebpackPlugin({
-            title: '页面标题',
-            template: './example/index.html'
-        }),
-        new CleanWebpackPlugin()
+  entry: ["./example/index.js"],
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: "页面标题",
+      template: "./example/index.html",
+    }),
+  ],
+  devServer: {
+    //port:8080,
+    open: true, //自动打开浏览器
+  },
 
-    ],
-    output: {
-        filename: 'bundle.js',
-        path: path.resolve(__dirname, 'dist')
-    },
-    devServer: {
-        //port:8080,
-        open: true,//自动打开浏览器
-    },
-
-    module: {
-        rules: [
-            {
-                test: /\.m?js$/,
-                exclude: /(node_modules|bower_components)/,
-                use: ['babel-loader']
+  module: {
+    rules: [
+      {
+        test: /\.m?js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: ["babel-loader"],
+      },
+      {
+        test: /\.(png|svg|jpg|gif|mp3)$/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              context: "./example",
+              name: "static/[path][name].[ext]",
             },
-            {
-                test: /\.css$/,
-                use: [
-                    'style-loader',
-                    'css-loader'
-                ]
-            }, {
-                test: /\.(png|svg|jpg|gif|mp3)$/,
-                use: [
-                    {
-                        loader: 'file-loader',
-                        options: {
-                            context: './example',
-                            name: 'static/[path][name].[ext]'
-                        }
-                    }
-
-                ]
-            }
-        ]
-    }
+          },
+        ],
+      },
+    ],
+  },
 };

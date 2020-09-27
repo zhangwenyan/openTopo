@@ -1,3 +1,8 @@
+# build
+built
+release
+
+yarn.lock
 # tools
 _book
 

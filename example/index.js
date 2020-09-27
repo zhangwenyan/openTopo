@@ -1,30 +1,12 @@
-import ot from '../src/index'
+import ot from "..";
 
+var scene = new ot.Scene();
+var stage = new ot.Stage("myCanvas", scene, 800, 600);
 
-import human_src from '../example/human.png';
-let canvas = document.getElementById('canvas');
-canvas.width = 800;
-canvas.height = 600;
-let stage = new ot.Stage(canvas);
-let scene = new ot.Scene(stage);
+var rect1 = new ot.Rect("rect1", 100, 100);
 
-let rect = new ot.Rect("tt", 200, 100);
-let rect1 = new ot.Rect('rect1', 200, 200);
-rect.image = human_src
+var rect2 = new ot.Rect("rect2", 10, 10);
 
-window.rect = rect;
+var rect3 = new ot.Rect("rect3", 100, 200);
 
-let circle = new ot.Circle("circle1", 100, 100);
-let link = new ot.Link(rect, rect1);
-
-let link1 = new ot.Link(rect1, circle);
-
-let c = new ot.RectContainer({ x: 100, y: 100, width: 100, height: 100 });
-
-scene.add(rect, rect1, link, circle, link1,c);
-
-
-window.ot = ot;
-window.stage = stage;
-
-
+scene.add(rect1, rect2, rect3);
