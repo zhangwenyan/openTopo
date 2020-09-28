@@ -1,11 +1,11 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
-  entry: ["./example/index.js"],
+  entry: ["./example_webpack/index.ts"],
   plugins: [
     new HtmlWebpackPlugin({
       title: "页面标题",
-      template: "./example/index.html",
+      template: "./example_webpack/index.html",
     }),
   ],
   devServer: {
@@ -16,22 +16,12 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.m?js$/,
-        exclude: /(node_modules|bower_components)/,
-        use: ["babel-loader"],
-      },
-      {
-        test: /\.(png|svg|jpg|gif|mp3)$/,
-        use: [
-          {
-            loader: "file-loader",
-            options: {
-              context: "./example",
-              name: "static/[path][name].[ext]",
-            },
-          },
-        ],
+        test: /\.ts?$/,
+        use: "ts-loader",
       },
     ],
+  },
+  resolve: {
+    extensions: [".ts", ".js"],
   },
 };

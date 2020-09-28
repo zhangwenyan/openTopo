@@ -1,4 +1,4 @@
-import ot from "..";
+import ot from "../src/index";
 
 var scene = new ot.Scene();
 var stage = new ot.Stage("myCanvas", scene, 800, 600);

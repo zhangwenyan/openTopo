@@ -3,7 +3,7 @@ module.exports = {
   entry: "./src/index.ts",
   output: {
     path: __dirname,
-    filename: "./release/bundle.js",
+    filename: "./release/opentopo.js",
     library: "opentopo",
     libraryTarget: "umd",
     libraryExport: "default",
@@ -11,24 +11,9 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.m?js$/,
-        exclude: /(node_modules|bower_components)/,
-        use: {
-          loader: "babel-loader",
-          options: {
-            presets: ["@babel/preset-env"],
-            plugins: ["@babel/plugin-proposal-class-properties"],
-          },
-        },
-      },
-      {
         test: /\.ts$/,
         use: ["ts-loader"],
       },
-      // {
-      //     test: /\.js$/,
-      //     loader: 'eslint-loader'
-      // }
     ],
   },
   resolve: {
