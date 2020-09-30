@@ -5,7 +5,7 @@ import Link from "./element/Link";
 import Circle from "./element/node/Circle";
 import RectContainer from "./element/node/container/RectContainer";
 export default {
-  version: "1.0.0",
+  version: "1.0.1",
   Stage,
   Scene,
   Rect,

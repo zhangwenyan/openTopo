@@ -2,9 +2,14 @@ import Scene from "./Scene";
 import BaseNode from "./element/node/BaseNode";
 import BaseElement from "./element/BaseElement";
 import BaseContainer from "./element/node/container/BaseContainer";
+import IElement from "./element/IElement";
 
 export default class Stage {
-  findByContainer(rect: BaseContainer, px: number, py: number): BaseElement {
+  /**
+   * console调试用属性,鼠标最后点击的元素
+   */
+  curEle: IElement | null = null;
+  findByContainer(rect: BaseContainer, px: number, py: number): IElement {
     px = px - rect.x;
     py = py - rect.y;
     for (let i = rect.elements.length - 1; i >= 0; i--) {
@@ -22,8 +27,16 @@ export default class Stage {
   focusEle: BaseElement | null = null;
   scene: Scene;
   wheelZoom: number = 0.95;
-  showFps = false;
+  showFps = true;
 
+  /**
+   * 舞台对象,一个canvas对应一个Stage
+   *
+   * @param canvas canvas元素或选择器(例如:#myCanvas)
+   * @param scene 场景
+   * @param width
+   * @param height
+   */
   constructor(
     canvas: string | HTMLCanvasElement,
     scene: Scene,
@@ -32,7 +45,7 @@ export default class Stage {
   ) {
     this.canvas =
       typeof canvas === "string"
-        ? <HTMLCanvasElement>document.getElementById(canvas)
+        ? <HTMLCanvasElement>document.querySelector(canvas)
         : canvas;
     this.scene = scene;
     if (width) {
@@ -49,8 +62,9 @@ export default class Stage {
     };
     requestAnimationFrame(loop);
 
+    //鼠标移动时,在什么元素上停留
     this.canvas.addEventListener("mousemove", (evt: MouseEvent) => {
-      if (evt.which == 1) {
+      if (evt.buttons == 1) {
         return;
       }
       let px = this.getCanvasPx(evt);
@@ -69,11 +83,20 @@ export default class Stage {
         }
       }
       this.focusEle = newFocus;
+      if (newFocus) {
+        this.canvas.style.cursor = "move";
+      } else {
+        this.canvas.style.cursor = "default";
+      }
     });
 
     this.canvas.addEventListener("mousedown", (evt: MouseEvent) => {
-      let px = this.getCanvasPx(evt);
-      let py = this.getCanvasPy(evt);
+      //只捕捉鼠标左键按下
+      if (evt.buttons !== 1) {
+        return;
+      }
+      const px = this.getCanvasPx(evt);
+      const py = this.getCanvasPy(evt);
       let dowmEle: BaseElement | null = null;
       for (let i = this.scene.elements.length - 1; i >= 0; i--) {
         let ele = this.scene.elements[i];
@@ -86,6 +109,7 @@ export default class Stage {
           break;
         }
       }
+      this.curEle = dowmEle;
 
       if (evt.ctrlKey) {
         //多选模式
@@ -93,12 +117,10 @@ export default class Stage {
           dowmEle.selected = !dowmEle.selected;
         }
       } else {
-        this.scene.eachAllEles((ele: BaseElement) => {
+        this.scene.eachAllEles((ele: IElement) => {
           ele.selected = ele === dowmEle;
         });
       }
-
-      this.canvas.style.cursor = dowmEle ? "move" : "pointer";
       let sPx = px; //起点坐标
       let sPy = py;
       let evt_mousemove = (evt1: MouseEvent) => {
@@ -109,7 +131,7 @@ export default class Stage {
         if (dowmEle) {
           sPx = px1;
           sPy = py1;
-          this.scene.eachAllEles((ele: BaseElement) => {
+          this.scene.eachAllEles((ele: IElement) => {
             if (ele instanceof BaseNode) {
               let node = <BaseNode>ele;
               if (node.selected && node.dragEnable) {
@@ -154,6 +176,10 @@ export default class Stage {
     });
   }
   lastTime = new Date();
+
+  /**
+   * 渲染
+   */
   tick() {
     if (this.showFps) {
       let now = new Date();
